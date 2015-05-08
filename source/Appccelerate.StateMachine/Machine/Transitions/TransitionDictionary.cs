@@ -16,13 +16,15 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+
+using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
+
 namespace Appccelerate.StateMachine.Machine.Transitions
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Manages the transitions of a state.
+    ///     Manages the transitions of a state.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -31,27 +33,27 @@ namespace Appccelerate.StateMachine.Machine.Transitions
         where TEvent : IComparable
     {
         /// <summary>
-        /// The transitions.
-        /// </summary>
-        private readonly Dictionary<TEvent, List<ITransition<TState, TEvent>>> transitions;
-
-        /// <summary>
-        /// The state this transition dictionary belongs to.
+        ///     The state this transition dictionary belongs to.
         /// </summary>
         private readonly IState<TState, TEvent> state;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransitionDictionary&lt;TState, TEvent&gt;"/> class.
+        ///     The transitions.
+        /// </summary>
+        private readonly Dictionary<TEvent, List<ITransition<TState, TEvent>>> transitions;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TransitionDictionary&lt;TState, TEvent&gt;" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
         public TransitionDictionary(IState<TState, TEvent> state)
         {
             this.state = state;
-            this.transitions = new Dictionary<TEvent, List<ITransition<TState, TEvent>>>();
+            transitions = new Dictionary<TEvent, List<ITransition<TState, TEvent>>>();
         }
 
         /// <summary>
-        /// Gets the transitions for the specified event id.
+        ///     Gets the transitions for the specified event id.
         /// </summary>
         /// <value>transitions for the event id.</value>
         /// <param name="eventId">Id of the event.</param>
@@ -62,82 +64,82 @@ namespace Appccelerate.StateMachine.Machine.Transitions
             {
                 List<ITransition<TState, TEvent>> result;
 
-                this.transitions.TryGetValue(eventId, out result);
+                transitions.TryGetValue(eventId, out result);
 
                 return result;
             }
         }
 
         /// <summary>
-        /// Adds the specified event id.
+        ///     Adds the specified event id.
         /// </summary>
         /// <param name="eventId">The event id.</param>
         /// <param name="transition">The transition.</param>
-        public void Add(TEvent eventId, ITransition<TState, TEvent> transition)
+        public void Add(TEvent eventId, [NotNull] ITransition<TState, TEvent> transition)
         {
-            Ensure.ArgumentNotNull(transition, "transition");
+            CheckTransitionDoesNotYetExist(transition);
 
-            this.CheckTransitionDoesNotYetExist(transition);
+            transition.Source = state;
 
-            transition.Source = this.state;
+            MakeSureEventExistsInTransitionList(eventId);
 
-            this.MakeSureEventExistsInTransitionList(eventId);
-
-            this.transitions[eventId].Add(transition);
+            transitions[eventId].Add(transition);
         }
 
         /// <summary>
-        /// Gets all transitions.
+        ///     Gets all transitions.
         /// </summary>
         /// <returns>All transitions.</returns>
         public IEnumerable<TransitionInfo<TState, TEvent>> GetTransitions()
         {
             var list = new List<TransitionInfo<TState, TEvent>>();
-            foreach (var eventId in this.transitions.Keys)
+            foreach (var eventId in transitions.Keys)
             {
-                this.GetTransitionsOfEvent(eventId, list);
+                GetTransitionsOfEvent(eventId, list);
             }
 
             return list;
         }
 
         /// <summary>
-        /// Throws an exception if the specified transition is already defined on this state.
+        ///     Throws an exception if the specified transition is already defined on this state.
         /// </summary>
         /// <param name="transition">The transition.</param>
         private void CheckTransitionDoesNotYetExist(ITransition<TState, TEvent> transition)
         {
             if (transition.Source != null)
             {
-                throw new InvalidOperationException(TransitionsExceptionMessages.TransitionDoesAlreadyExist(transition, this.state));
+                throw new InvalidOperationException(TransitionsExceptionMessages.TransitionDoesAlreadyExist(transition,
+                    state));
             }
         }
 
         /// <summary>
-        /// If there is no entry in the <see cref="transitions"/> dictionary then one is created.
+        ///     If there is no entry in the <see cref="transitions" /> dictionary then one is created.
         /// </summary>
         /// <param name="eventId">The event id.</param>
         private void MakeSureEventExistsInTransitionList(TEvent eventId)
         {
-            if (this.transitions.ContainsKey(eventId))
+            if (transitions.ContainsKey(eventId))
             {
                 return;
             }
 
             var list = new List<ITransition<TState, TEvent>>();
-            this.transitions.Add(eventId, list);
+            transitions.Add(eventId, list);
         }
 
         /// <summary>
-        /// Gets all the transitions associated to the specified event.
+        ///     Gets all the transitions associated to the specified event.
         /// </summary>
         /// <param name="eventId">The event id.</param>
         /// <param name="list">The list to add the transition.</param>
         private void GetTransitionsOfEvent(TEvent eventId, List<TransitionInfo<TState, TEvent>> list)
         {
-            foreach (var transition in this.transitions[eventId])
+            foreach (var transition in transitions[eventId])
             {
-                list.Add(new TransitionInfo<TState, TEvent>(eventId, transition.Source, transition.Target, transition.Guard, transition.Actions));
+                list.Add(new TransitionInfo<TState, TEvent>(eventId, transition.Source, transition.Target,
+                    transition.Guard, transition.Actions));
             }
         }
     }

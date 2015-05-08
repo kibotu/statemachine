@@ -16,20 +16,20 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using Appccelerate.StateMachine.Machine;
+using Appccelerate.StateMachine.Machine.Transitions;
+using JetBrains.Annotations;
+
 namespace Appccelerate.StateMachine.Reports
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text;
-
-    using Appccelerate.Formatters;
-    using Appccelerate.StateMachine.Machine;
-    using Appccelerate.StateMachine.Machine.Transitions;
-
     /// <summary>
-    /// Creates a textual report of a state machine.
+    ///     Creates a textual report of a state machine.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -38,47 +38,47 @@ namespace Appccelerate.StateMachine.Reports
         where TEvent : IComparable
     {
         /// <summary>
-        /// Gets the resulting report.
+        ///     Gets the resulting report.
         /// </summary>
         /// <value>The result.</value>
         public string Result { get; private set; }
 
         /// <summary>
-        /// Generates a report of the state machine.
+        ///     Generates a report of the state machine.
         /// </summary>
         /// <param name="name">The name of the state machine.</param>
         /// <param name="states">The states.</param>
         /// <param name="initialStateId">The initial state id.</param>
-        public void Report(string name, IEnumerable<IState<TState, TEvent>> states, Initializable<TState> initialStateId)
+        public void Report(string name, [NotNull] IEnumerable<IState<TState, TEvent>> states,
+            [NotNull] Initializable<TState> initialStateId)
         {
             states = states.ToList();
-
-            Ensure.ArgumentNotNull(states, "states");
-            Ensure.ArgumentNotNull(initialStateId, "initialStateId");
 
             var report = new StringBuilder();
 
             const string Indentation = "    ";
 
-            report.AppendFormat("{0}: initial state = {1}{2}", name, initialStateId.IsInitialized ? initialStateId.Value.ToString() : "none", Environment.NewLine);
+            report.AppendFormat("{0}: initial state = {1}{2}", name,
+                initialStateId.IsInitialized ? initialStateId.Value.ToString() : "none", Environment.NewLine);
 
             // write states
             var rootStates = states.Where(state => state.SuperState == null);
             foreach (var state in rootStates)
             {
-                this.ReportState(state, report, Indentation);
+                ReportState(state, report, Indentation);
             }
 
-            this.Result = report.ToString();
+            Result = report.ToString();
         }
 
         /// <summary>
-        /// Reports the state name, initial state, history type, entry and exit action.
+        ///     Reports the state name, initial state, history type, entry and exit action.
         /// </summary>
         /// <param name="report">The report.</param>
         /// <param name="indentation">The current indentation.</param>
         /// <param name="state">The state.</param>
-        private static void ReportStateNameInitialStateHistoryTypeEntryAndExitAction(StringBuilder report, string indentation, IState<TState, TEvent> state)
+        private static void ReportStateNameInitialStateHistoryTypeEntryAndExitAction(StringBuilder report,
+            string indentation, IState<TState, TEvent> state)
         {
             report.AppendFormat(
                 CultureInfo.InvariantCulture,
@@ -91,25 +91,26 @@ namespace Appccelerate.StateMachine.Reports
             indentation += "    ";
 
             report.AppendFormat(
-                "{0}entry action: {1}{2}", 
+                "{0}entry action: {1}{2}",
                 indentation,
-                FormatHelper.ConvertToString(state.EntryActions.Select(action => action.Describe()), ", "), 
+                string.Join(", ", state.EntryActions.Select(action => action.Describe())),
                 Environment.NewLine);
-            
+
             report.AppendFormat(
-                "{0}exit action: {1}{2}", 
+                "{0}exit action: {1}{2}",
                 indentation,
-                FormatHelper.ConvertToString(state.ExitActions.Select(action => action.Describe()), ", "), 
+                string.Join(", ", state.ExitActions.Select(action => action.Describe())),
                 Environment.NewLine);
         }
 
         /// <summary>
-        /// Reports the transition.
+        ///     Reports the transition.
         /// </summary>
         /// <param name="report">The report.</param>
         /// <param name="indentation">The indentation.</param>
         /// <param name="transition">The transition.</param>
-        private static void ReportTransition(StringBuilder report, string indentation, TransitionInfo<TState, TEvent> transition)
+        private static void ReportTransition(StringBuilder report, string indentation,
+            TransitionInfo<TState, TEvent> transition)
         {
             report.AppendFormat(
                 CultureInfo.InvariantCulture,
@@ -117,13 +118,13 @@ namespace Appccelerate.StateMachine.Reports
                 indentation,
                 transition.EventId,
                 transition.Target != null ? transition.Target.ToString() : "internal",
-                FormatHelper.ConvertToString(transition.Actions.Select(action => action.Describe()), ", "),
+                string.Join(", ", transition.Actions.Select(action => action.Describe())),
                 transition.Guard != null ? transition.Guard.Describe() : string.Empty,
                 Environment.NewLine);
         }
 
         /// <summary>
-        /// Creates the part of the report for the specified state.
+        ///     Creates the part of the report for the specified state.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <param name="report">The report to add to.</param>
@@ -141,7 +142,7 @@ namespace Appccelerate.StateMachine.Reports
 
             foreach (var subState in state.SubStates)
             {
-                this.ReportState(subState, report, indentation);
+                ReportState(subState, report, indentation);
             }
         }
     }

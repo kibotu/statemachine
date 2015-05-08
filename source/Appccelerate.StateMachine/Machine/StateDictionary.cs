@@ -16,30 +16,30 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using Appccelerate.StateMachine.Machine.Events;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Appccelerate.StateMachine.Machine.Events;
-
     /// <summary>
-    /// Dictionary mapping state ids to states.
+    ///     Dictionary mapping state ids to states.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     public class StateDictionary<TState, TEvent> : IStateDictionary<TState, TEvent> where TState : IComparable
-                                                                                      where TEvent : IComparable
+        where TEvent : IComparable
     {
         /// <summary>
-        /// Maps ids to states.
+        ///     Maps ids to states.
         /// </summary>
-        private readonly Dictionary<TState, IState<TState, TEvent>> dictionary = new Dictionary<TState, IState<TState, TEvent>>();
+        private readonly Dictionary<TState, IState<TState, TEvent>> dictionary =
+            new Dictionary<TState, IState<TState, TEvent>>();
 
         private readonly IFactory<TState, TEvent> factory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateDictionary&lt;TState, TEvent&gt;"/> class.
+        ///     Initializes a new instance of the <see cref="StateDictionary&lt;TState, TEvent&gt;" /> class.
         /// </summary>
         /// <param name="factory">The factory.</param>
         public StateDictionary(IFactory<TState, TEvent> factory)
@@ -48,7 +48,7 @@ namespace Appccelerate.StateMachine.Machine
         }
 
         /// <summary>
-        /// Gets the <see cref="IState&lt;TState,TEvent&gt;"/> with the specified state id.
+        ///     Gets the <see cref="IState&lt;TState,TEvent&gt;" /> with the specified state id.
         /// </summary>
         /// <value>State with the specified id.</value>
         /// <param name="stateId">The State id.</param>
@@ -57,22 +57,22 @@ namespace Appccelerate.StateMachine.Machine
         {
             get
             {
-                if (!this.dictionary.ContainsKey(stateId))
+                if (!dictionary.ContainsKey(stateId))
                 {
-                    this.dictionary.Add(stateId, this.factory.CreateState(stateId));
+                    dictionary.Add(stateId, factory.CreateState(stateId));
                 }
 
-                return this.dictionary[stateId];
+                return dictionary[stateId];
             }
         }
 
         /// <summary>
-        /// Gets all states defined in this dictionary.
+        ///     Gets all states defined in this dictionary.
         /// </summary>
         /// <returns>All states in this directory.</returns>
         public IEnumerable<IState<TState, TEvent>> GetStates()
         {
-            return new List<IState<TState, TEvent>>(this.dictionary.Values);
+            return new List<IState<TState, TEvent>>(dictionary.Values);
         }
     }
 }

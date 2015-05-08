@@ -16,13 +16,13 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Generates a report of the state machine.
+    ///     Generates a report of the state machine.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -31,7 +31,7 @@ namespace Appccelerate.StateMachine.Machine
         where TEvent : IComparable
     {
         /// <summary>
-        /// Generates a report of the state machine.
+        ///     Generates a report of the state machine.
         /// </summary>
         /// <param name="name">The name of the state machine.</param>
         /// <param name="states">The states.</param>

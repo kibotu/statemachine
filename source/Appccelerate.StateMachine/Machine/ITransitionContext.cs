@@ -16,12 +16,12 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-
     /// <summary>
-    /// Provides information about the current transition.
+    ///     Provides information about the current transition.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -29,17 +29,11 @@ namespace Appccelerate.StateMachine.Machine
         where TState : IComparable where TEvent : IComparable
     {
         IState<TState, TEvent> State { get; }
-
         Missable<TEvent> EventId { get; }
-
         object EventArgument { get; }
-
         void AddRecord(TState stateId, RecordType recordType);
-
         string GetRecords();
-
         void OnExceptionThrown(Exception exception);
-
         void OnTransitionBegin();
     }
 }

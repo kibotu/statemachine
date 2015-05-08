@@ -16,24 +16,23 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using Appccelerate.StateMachine.Machine;
+
 namespace Appccelerate.StateMachine.Persistence
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Appccelerate.StateMachine.Machine;
-
     public interface IStateMachineLoader<TState>
         where TState : IComparable
     {
         /// <summary>
-        /// Returns the state to be set as the current state of the state machine.
+        ///     Returns the state to be set as the current state of the state machine.
         /// </summary>
         /// <returns>State id.</returns>
         Initializable<TState> LoadCurrentState();
 
         /// <summary>
-        /// Returns the last active state of all super states that have a last active state (i.e. they count as visited).
+        ///     Returns the last active state of all super states that have a last active state (i.e. they count as visited).
         /// </summary>
         /// <returns>Key = id of super state, Value = id of last active state.</returns>
         IDictionary<TState, TState> LoadHistoryStates();

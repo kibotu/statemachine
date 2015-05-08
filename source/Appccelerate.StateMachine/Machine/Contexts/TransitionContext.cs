@@ -16,15 +16,15 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+
 namespace Appccelerate.StateMachine.Machine.Contexts
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
-
     /// <summary>
-    /// Provides context information during a transition.
+    ///     Provides context information during a transition.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -33,61 +33,59 @@ namespace Appccelerate.StateMachine.Machine.Contexts
         where TState : IComparable
         where TEvent : IComparable
     {
-        private readonly IState<TState, TEvent> state;
-        private readonly Missable<TEvent> eventId;
         private readonly object eventArgument;
+        private readonly Missable<TEvent> eventId;
         private readonly List<Record> records;
+        private readonly IState<TState, TEvent> state;
 
-        public TransitionContext(IState<TState, TEvent> state, Missable<TEvent> eventId, object eventArgument, INotifier<TState, TEvent> notifier)
+        public TransitionContext(IState<TState, TEvent> state, Missable<TEvent> eventId, object eventArgument,
+            INotifier<TState, TEvent> notifier)
         {
             this.state = state;
             this.eventId = eventId;
             this.eventArgument = eventArgument;
-            this.Notifier = notifier;
+            Notifier = notifier;
 
-            this.records = new List<Record>();
+            records = new List<Record>();
         }
+
+        private INotifier<TState, TEvent> Notifier { get; set; }
 
         public IState<TState, TEvent> State
         {
-            get { return this.state; }
+            get { return state; }
         }
 
         public Missable<TEvent> EventId
         {
-            get { return this.eventId; }
+            get { return eventId; }
         }
 
         public object EventArgument
         {
-            get { return this.eventArgument; }
-        }
-
-        private INotifier<TState, TEvent> Notifier
-        {
-            get; set;
+            get { return eventArgument; }
         }
 
         public void OnExceptionThrown(Exception exception)
         {
-            this.Notifier.OnExceptionThrown(this, exception);
+            Notifier.OnExceptionThrown(this, exception);
         }
 
         public void OnTransitionBegin()
         {
-            this.Notifier.OnTransitionBegin(this);
+            Notifier.OnTransitionBegin(this);
         }
 
         public void AddRecord(TState stateId, RecordType recordType)
         {
-            this.records.Add(new Record(stateId, recordType));
+            records.Add(new Record(stateId, recordType));
         }
 
         public string GetRecords()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            this.records.ForEach(record => result.AppendFormat(" -> {0}", record));
+            records.ForEach(record => result.AppendFormat(" -> {0}", record));
 
             return result.ToString();
         }
@@ -96,17 +94,16 @@ namespace Appccelerate.StateMachine.Machine.Contexts
         {
             public Record(TState stateId, RecordType recordType)
             {
-                this.StateId = stateId;
-                this.RecordType = recordType;
+                StateId = stateId;
+                RecordType = recordType;
             }
 
             private TState StateId { get; set; }
-
             private RecordType RecordType { get; set; }
 
             public override string ToString()
             {
-                return this.RecordType + " " + this.StateId;
+                return RecordType + " " + StateId;
             }
         }
     }

@@ -16,31 +16,32 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine.Transitions
 {
-    using System;
-
     public class TransitionResult<TState, TEvent>
         : ITransitionResult<TState, TEvent>
         where TState : IComparable
         where TEvent : IComparable
     {
-        public static readonly ITransitionResult<TState, TEvent> NotFired = new TransitionResult<TState, TEvent>(false, null);
+        public static readonly ITransitionResult<TState, TEvent> NotFired = new TransitionResult<TState, TEvent>(false,
+            null);
 
         public TransitionResult(bool fired, IState<TState, TEvent> newState)
         {
-            this.Fired = fired;
-            this.NewState = newState;
+            Fired = fired;
+            NewState = newState;
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ITransitionResult{TState, TEvent}"/> is fired.
+        ///     Gets a value indicating whether this <see cref="ITransitionResult{TState, TEvent}" /> is fired.
         /// </summary>
         /// <value><c>true</c> if fired; otherwise, <c>false</c>.</value>
         public bool Fired { get; private set; }
 
         /// <summary>
-        /// Gets the new state the state machine is in.
+        ///     Gets the new state the state machine is in.
         /// </summary>
         /// <value>The new state.</value>
         public IState<TState, TEvent> NewState { get; private set; }

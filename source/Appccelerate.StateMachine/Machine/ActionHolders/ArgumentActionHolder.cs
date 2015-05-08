@@ -16,13 +16,13 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Appccelerate.StateMachine.Machine.ActionHolders
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     public class ArgumentActionHolder<T> : IActionHolder
     {
         private readonly Action<T> action;
@@ -34,24 +34,27 @@ namespace Appccelerate.StateMachine.Machine.ActionHolders
 
         public void Execute(object argument)
         {
-            T castArgument = default(T);
+            var castArgument = default(T);
 
             if (argument != Missing.Value && !(argument is T))
             {
-                throw new ArgumentException(ActionHoldersExceptionMessages.CannotCastArgumentToActionArgument(argument, this.Describe()));
+                throw new ArgumentException(ActionHoldersExceptionMessages.CannotCastArgumentToActionArgument(argument,
+                    Describe()));
             }
 
             if (argument != Missing.Value)
             {
-                castArgument = (T)argument;
+                castArgument = (T) argument;
             }
 
-            this.action(castArgument);
+            action(castArgument);
         }
 
         public string Describe()
         {
-            return this.action.GetMethodInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ? "anonymous" : this.action.GetMethodInfo().Name;
+            return action.GetMethodInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any()
+                ? "anonymous"
+                : action.GetMethodInfo().Name;
         }
     }
 }

@@ -16,12 +16,12 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine
 {
-    using System;
-
     /// <summary>
-    /// Provides information about a state machine.
+    ///     Provides information about a state machine.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -31,13 +31,13 @@ namespace Appccelerate.StateMachine
         where TEvent : IComparable
     {
         /// <summary>
-        /// Gets the name of this instance.
+        ///     Gets the name of this instance.
         /// </summary>
         /// <value>The name of this instance.</value>
         string Name { get; }
 
         /// <summary>
-        /// Gets the id of the current state.
+        ///     Gets the id of the current state.
         /// </summary>
         /// <value>The id of the current state.</value>
         TState CurrentStateId { get; }

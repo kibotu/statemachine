@@ -16,19 +16,19 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Appccelerate.StateMachine.Machine;
+using Appccelerate.StateMachine.Machine.Transitions;
+using JetBrains.Annotations;
+
 namespace Appccelerate.StateMachine.Reports
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-
-    using Appccelerate.Formatters;
-    using Appccelerate.StateMachine.Machine;
-    using Appccelerate.StateMachine.Machine.Transitions;
-
     /// <summary>
-    /// Writes the transitions of a state machine to a stream as csv.
+    ///     Writes the transitions of a state machine to a stream as csv.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -39,7 +39,7 @@ namespace Appccelerate.StateMachine.Reports
         private readonly StreamWriter writer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CsvTransitionsWriter&lt;TState, TEvent&gt;"/> class.
+        ///     Initializes a new instance of the <see cref="CsvTransitionsWriter&lt;TState, TEvent&gt;" /> class.
         /// </summary>
         /// <param name="writer">The writer.</param>
         public CsvTransitionsWriter(StreamWriter writer)
@@ -48,46 +48,44 @@ namespace Appccelerate.StateMachine.Reports
         }
 
         /// <summary>
-        /// Writes the transitions of the specified states.
+        ///     Writes the transitions of the specified states.
         /// </summary>
         /// <param name="states">The states.</param>
-        public void Write(IEnumerable<IState<TState, TEvent>> states)
+        public void Write([NotNull] IEnumerable<IState<TState, TEvent>> states)
         {
             states = states.ToList();
 
-            Ensure.ArgumentNotNull(states, "states");
-
-            this.WriteTransitionsHeader();
+            WriteTransitionsHeader();
 
             foreach (var state in states)
             {
-                this.ReportTransitionsOfState(state);
+                ReportTransitionsOfState(state);
             }
         }
 
         private void WriteTransitionsHeader()
         {
-            this.writer.WriteLine("Source;Event;Guard;Target;Actions");
+            writer.WriteLine("Source;Event;Guard;Target;Actions");
         }
 
         private void ReportTransitionsOfState(IState<TState, TEvent> state)
         {
             foreach (var transition in state.Transitions.GetTransitions())
             {
-                this.ReportTransition(transition);
+                ReportTransition(transition);
             }
         }
 
         private void ReportTransition(TransitionInfo<TState, TEvent> transition)
         {
-            string source = transition.Source.ToString();
-            string target = transition.Target != null ? transition.Target.Id.ToString() : "internal transition";
-            string eventId = transition.EventId.ToString();
+            var source = transition.Source.ToString();
+            var target = transition.Target != null ? transition.Target.Id.ToString() : "internal transition";
+            var eventId = transition.EventId.ToString();
 
-            string guard = transition.Guard != null ? transition.Guard.Describe() : string.Empty;
-            string actions = FormatHelper.ConvertToString(transition.Actions.Select(action => action.Describe()), ", ");
+            var guard = transition.Guard != null ? transition.Guard.Describe() : string.Empty;
+            var actions = string.Join(", ", transition.Actions.Select(action => action.Describe()));
 
-            this.writer.WriteLine(
+            writer.WriteLine(
                 "{0};{1};{2};{3};{4}",
                 source,
                 eventId,

@@ -16,22 +16,22 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-
     public class Missable<T>
     {
         private T value;
 
         public Missable()
         {
-            this.IsMissing = true;
+            IsMissing = true;
         }
 
         public Missable(T value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public bool IsMissing { get; private set; }
@@ -40,19 +40,19 @@ namespace Appccelerate.StateMachine.Machine
         {
             get
             {
-                if (this.IsMissing)
+                if (IsMissing)
                 {
                     throw new InvalidOperationException("a missing value cannot be accessed.");
                 }
 
-                return this.value;
+                return value;
             }
 
             private set
             {
                 this.value = value;
 
-                this.IsMissing = false;
+                IsMissing = false;
             }
         }
     }

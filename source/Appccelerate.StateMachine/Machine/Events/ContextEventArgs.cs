@@ -16,12 +16,12 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine.Events
 {
-    using System;
-
     /// <summary>
-    /// Event arguments holding context information.
+    ///     Event arguments holding context information.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -39,7 +39,7 @@ namespace Appccelerate.StateMachine.Machine.Events
 
         protected ITransitionContext<TState, TEvent> Context
         {
-            get { return this.context; }
+            get { return context; }
         }
     }
 }

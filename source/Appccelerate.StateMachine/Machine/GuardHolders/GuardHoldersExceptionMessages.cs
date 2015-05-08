@@ -16,17 +16,17 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System.Globalization;
+
 namespace Appccelerate.StateMachine.Machine.GuardHolders
 {
-    using System.Globalization;
-
     /// <summary>
-    /// Holds all exception messages
+    ///     Holds all exception messages
     /// </summary>
     public static class GuardHoldersExceptionMessages
     {
         /// <summary>
-        /// Cannot cast argument to guard argument.
+        ///     Cannot cast argument to guard argument.
         /// </summary>
         /// <param name="argument">The argument.</param>
         /// <param name="guard">The guard.</param>

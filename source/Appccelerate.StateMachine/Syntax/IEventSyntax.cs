@@ -19,14 +19,14 @@
 namespace Appccelerate.StateMachine.Syntax
 {
     /// <summary>
-    /// Defines the event syntax.
+    ///     Defines the event syntax.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     public interface IEventSyntax<TState, TEvent>
     {
         /// <summary>
-        /// Defines an event that is accepted.
+        ///     Defines an event that is accepted.
         /// </summary>
         /// <param name="eventId">The event id.</param>
         /// <returns>On syntax.</returns>

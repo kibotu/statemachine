@@ -16,13 +16,13 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Appccelerate.StateMachine.Machine.ActionHolders
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     public class ArgumentLessActionHolder : IActionHolder
     {
         private readonly Action action;
@@ -34,12 +34,14 @@ namespace Appccelerate.StateMachine.Machine.ActionHolders
 
         public void Execute(object argument)
         {
-            this.action();
+            action();
         }
 
         public string Describe()
         {
-            return this.action.GetMethodInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ? "anonymous" : this.action.GetMethodInfo().Name;
+            return action.GetMethodInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any()
+                ? "anonymous"
+                : action.GetMethodInfo().Name;
         }
     }
 }

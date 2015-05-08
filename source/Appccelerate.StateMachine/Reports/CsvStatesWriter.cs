@@ -16,18 +16,18 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Appccelerate.StateMachine.Machine;
+using JetBrains.Annotations;
+
 namespace Appccelerate.StateMachine.Reports
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-
-    using Appccelerate.Formatters;
-    using Appccelerate.StateMachine.Machine;
-
     /// <summary>
-    /// Writes the states of a state machine to a stream as csv.
+    ///     Writes the states of a state machine to a stream as csv.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -38,7 +38,7 @@ namespace Appccelerate.StateMachine.Reports
         private readonly StreamWriter writer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CsvStatesWriter&lt;TState, TEvent&gt;"/> class.
+        ///     Initializes a new instance of the <see cref="CsvStatesWriter&lt;TState, TEvent&gt;" /> class.
         /// </summary>
         /// <param name="writer">The writer.</param>
         public CsvStatesWriter(StreamWriter writer)
@@ -47,35 +47,33 @@ namespace Appccelerate.StateMachine.Reports
         }
 
         /// <summary>
-        /// Writes the specified states.
+        ///     Writes the specified states.
         /// </summary>
         /// <param name="states">The states.</param>
-        public void Write(IEnumerable<IState<TState, TEvent>> states)
+        public void Write([NotNull] IEnumerable<IState<TState, TEvent>> states)
         {
             states = states.ToList();
 
-            Ensure.ArgumentNotNull(states, "states");
-
-            this.WriteStatesHeader();
+            WriteStatesHeader();
 
             foreach (var state in states)
             {
-                this.ReportState(state);
+                ReportState(state);
             }
         }
 
         private void WriteStatesHeader()
         {
-            this.writer.WriteLine("Source;Entry;Exit;Children");
+            writer.WriteLine("Source;Entry;Exit;Children");
         }
 
         private void ReportState(IState<TState, TEvent> state)
         {
-            string entry = FormatHelper.ConvertToString(state.EntryActions.Select(action => action.Describe()), ", ");
-            string exit = FormatHelper.ConvertToString(state.ExitActions.Select(action => action.Describe()), ", ");
-            string children = FormatHelper.ConvertToString(state.SubStates.Select(s => s.Id.ToString()), ", ");
+            var entry = string.Join(", ", state.EntryActions.Select(action => action.Describe()));
+            var exit = string.Join(", ", state.ExitActions.Select(action => action.Describe()));
+            var children = string.Join(", ", state.SubStates.Select(s => s.Id.ToString()));
 
-            this.writer.WriteLine(
+            writer.WriteLine(
                 "{0};{1};{2};{3}",
                 state.Id,
                 entry,

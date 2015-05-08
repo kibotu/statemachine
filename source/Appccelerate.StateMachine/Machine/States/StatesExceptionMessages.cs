@@ -16,17 +16,17 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System.Globalization;
+
 namespace Appccelerate.StateMachine.Machine.States
 {
-    using System.Globalization;
-
     /// <summary>
-    /// Holds all exception messages
+    ///     Holds all exception messages
     /// </summary>
     public static class StatesExceptionMessages
     {
         /// <summary>
-        /// State cannot be its own super-state..
+        ///     State cannot be its own super-state..
         /// </summary>
         /// <param name="state">The state.</param>
         /// <returns>error message</returns>
@@ -36,7 +36,7 @@ namespace Appccelerate.StateMachine.Machine.States
         }
 
         /// <summary>
-        /// State cannot be the initial sub-state to itself.
+        ///     State cannot be the initial sub-state to itself.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <returns>error message</returns>
@@ -47,7 +47,7 @@ namespace Appccelerate.StateMachine.Machine.States
         }
 
         /// <summary>
-        /// State cannot be the initial state of super state because it is not a direct sub-state.
+        ///     State cannot be the initial state of super state because it is not a direct sub-state.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <param name="superState">State of the super.</param>

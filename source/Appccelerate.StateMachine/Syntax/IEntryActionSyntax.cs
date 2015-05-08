@@ -16,26 +16,26 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Syntax
 {
-    using System;
-
     /// <summary>
-    /// Defines the entry action syntax.
+    ///     Defines the entry action syntax.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     public interface IEntryActionSyntax<TState, TEvent> : IExitActionSyntax<TState, TEvent>
     {
         /// <summary>
-        /// Defines an entry action.
+        ///     Defines an entry action.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <returns>Exit action syntax.</returns>
         IEntryActionSyntax<TState, TEvent> ExecuteOnEntry(Action action);
 
         /// <summary>
-        /// Defines an entry action.
+        ///     Defines an entry action.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <returns>Exit action syntax.</returns>
@@ -43,7 +43,7 @@ namespace Appccelerate.StateMachine.Syntax
         IEntryActionSyntax<TState, TEvent> ExecuteOnEntry<T>(Action<T> action);
 
         /// <summary>
-        /// Defines an entry action.
+        ///     Defines an entry action.
         /// </summary>
         /// <typeparam name="T">Type of the parameter of the entry action method.</typeparam>
         /// <param name="action">The action.</param>

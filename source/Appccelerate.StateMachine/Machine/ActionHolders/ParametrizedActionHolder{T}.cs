@@ -16,17 +16,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Appccelerate.StateMachine.Machine.ActionHolders
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     public class ParametrizedActionHolder<T> : IActionHolder
     {
         private readonly Action<T> action;
-
         private readonly T parameter;
 
         public ParametrizedActionHolder(Action<T> action, T parameter)
@@ -37,12 +36,14 @@ namespace Appccelerate.StateMachine.Machine.ActionHolders
 
         public void Execute(object argument)
         {
-            this.action(this.parameter);
+            action(parameter);
         }
 
         public string Describe()
         {
-            return this.action.GetMethodInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ? "anonymous" : this.action.GetMethodInfo().Name;
+            return action.GetMethodInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any()
+                ? "anonymous"
+                : action.GetMethodInfo().Name;
         }
     }
 }

@@ -15,15 +15,16 @@
 //   limitations under the License.
 // </copyright>
 //-------------------------------------------------------------------------------
+
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Appccelerate.StateMachine.Machine.GuardHolders
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
-    /// Holds a single argument guard.
+    ///     Holds a single argument guard.
     /// </summary>
     /// <typeparam name="T">Type of the argument of the guard.</typeparam>
     public class ArgumentGuardHolder<T> : IGuardHolder
@@ -31,7 +32,7 @@ namespace Appccelerate.StateMachine.Machine.GuardHolders
         private readonly Func<T, bool> guard;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArgumentGuardHolder{T}"/> class.
+        ///     Initializes a new instance of the <see cref="ArgumentGuardHolder{T}" /> class.
         /// </summary>
         /// <param name="guard">The guard.</param>
         public ArgumentGuardHolder(Func<T, bool> guard)
@@ -40,7 +41,7 @@ namespace Appccelerate.StateMachine.Machine.GuardHolders
         }
 
         /// <summary>
-        /// Executes the guard.
+        ///     Executes the guard.
         /// </summary>
         /// <param name="argument">The state machine event argument.</param>
         /// <returns>Result of the guard execution.</returns>
@@ -48,19 +49,22 @@ namespace Appccelerate.StateMachine.Machine.GuardHolders
         {
             if (argument != null && !(argument is T))
             {
-                throw new ArgumentException(GuardHoldersExceptionMessages.CannotCastArgumentToGuardArgument(argument, this.Describe()));
+                throw new ArgumentException(GuardHoldersExceptionMessages.CannotCastArgumentToGuardArgument(argument,
+                    Describe()));
             }
 
-            return this.guard((T)argument);
+            return guard((T) argument);
         }
 
         /// <summary>
-        /// Describes the guard.
+        ///     Describes the guard.
         /// </summary>
         /// <returns>Description of the guard.</returns>
         public string Describe()
         {
-            return this.guard.GetMethodInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ? "anonymous" : this.guard.GetMethodInfo().Name;
+            return guard.GetMethodInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any()
+                ? "anonymous"
+                : guard.GetMethodInfo().Name;
         }
     }
 }

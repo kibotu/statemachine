@@ -16,16 +16,15 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using Appccelerate.StateMachine.Machine.ActionHolders;
+using Appccelerate.StateMachine.Machine.GuardHolders;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Appccelerate.StateMachine.Machine.ActionHolders;
-    using Appccelerate.StateMachine.Machine.GuardHolders;
-
     /// <summary>
-    /// Represents a transition in the state machine.
+    ///     Represents a transition in the state machine.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -34,31 +33,31 @@ namespace Appccelerate.StateMachine.Machine
         where TEvent : IComparable
     {
         /// <summary>
-        /// Gets or sets the source state of the transition.
+        ///     Gets or sets the source state of the transition.
         /// </summary>
         /// <value>The source.</value>
         IState<TState, TEvent> Source { get; set; }
 
         /// <summary>
-        /// Gets or sets the target state of the transition.
+        ///     Gets or sets the target state of the transition.
         /// </summary>
         /// <value>The target.</value>
         IState<TState, TEvent> Target { get; set; }
 
         /// <summary>
-        /// Gets the actions of this transition.
+        ///     Gets the actions of this transition.
         /// </summary>
         /// <value>The actions.</value>
         ICollection<IActionHolder> Actions { get; }
 
         /// <summary>
-        /// Gets or sets the guard of this transition.
+        ///     Gets or sets the guard of this transition.
         /// </summary>
         /// <value>The guard.</value>
         IGuardHolder Guard { get; set; }
 
         /// <summary>
-        /// Fires the transition.
+        ///     Fires the transition.
         /// </summary>
         /// <param name="context">The event context.</param>
         /// <returns>The result of the transition.</returns>

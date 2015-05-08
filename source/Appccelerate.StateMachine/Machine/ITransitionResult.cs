@@ -16,12 +16,12 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-
     /// <summary>
-    /// Represents the result of a transition.
+    ///     Represents the result of a transition.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -30,13 +30,13 @@ namespace Appccelerate.StateMachine.Machine
         where TEvent : IComparable
     {
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ITransitionResult{TState, TEvent}"/> is fired.
+        ///     Gets a value indicating whether this <see cref="ITransitionResult{TState, TEvent}" /> is fired.
         /// </summary>
         /// <value><c>true</c> if fired; otherwise, <c>false</c>.</value>
         bool Fired { get; }
 
         /// <summary>
-        /// Gets the new state.
+        ///     Gets the new state.
         /// </summary>
         /// <value>The new state.</value>
         IState<TState, TEvent> NewState { get; }

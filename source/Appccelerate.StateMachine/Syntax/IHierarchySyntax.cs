@@ -30,6 +30,6 @@ namespace Appccelerate.StateMachine.Syntax
 
     public interface ISubStateSyntax<in TState>
     {
-        ISubStateSyntax<TState> WithSubState(TState stateId); 
+        ISubStateSyntax<TState> WithSubState(TState stateId);
     }
 }

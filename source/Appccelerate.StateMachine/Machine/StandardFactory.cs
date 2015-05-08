@@ -16,32 +16,32 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using Appccelerate.StateMachine.Machine.ActionHolders;
+using Appccelerate.StateMachine.Machine.Contexts;
+using Appccelerate.StateMachine.Machine.Events;
+using Appccelerate.StateMachine.Machine.GuardHolders;
+using Appccelerate.StateMachine.Machine.States;
+using Appccelerate.StateMachine.Machine.Transitions;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-
-    using Appccelerate.StateMachine.Machine.ActionHolders;
-    using Appccelerate.StateMachine.Machine.Contexts;
-    using Appccelerate.StateMachine.Machine.Events;
-    using Appccelerate.StateMachine.Machine.GuardHolders;
-    using Appccelerate.StateMachine.Machine.States;
-    using Appccelerate.StateMachine.Machine.Transitions;
-
     /// <summary>
-    /// Standard implementation of the state machine factory.
+    ///     Standard implementation of the state machine factory.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
     public class StandardFactory<TState, TEvent> : IFactory<TState, TEvent>
-    // ReSharper restore ClassWithVirtualMembersNeverInherited.Global
+        // ReSharper restore ClassWithVirtualMembersNeverInherited.Global
         where TState : IComparable
         where TEvent : IComparable
     {
-        private readonly IStateMachineInformation<TState, TEvent> stateMachineInformation;
         private readonly IExtensionHost<TState, TEvent> extensionHost;
+        private readonly IStateMachineInformation<TState, TEvent> stateMachineInformation;
 
-        public StandardFactory(IStateMachineInformation<TState, TEvent> stateMachineInformation, IExtensionHost<TState, TEvent> extensionHost)
+        public StandardFactory(IStateMachineInformation<TState, TEvent> stateMachineInformation,
+            IExtensionHost<TState, TEvent> extensionHost)
         {
             this.stateMachineInformation = stateMachineInformation;
             this.extensionHost = extensionHost;
@@ -49,12 +49,12 @@ namespace Appccelerate.StateMachine.Machine
 
         public virtual IState<TState, TEvent> CreateState(TState id)
         {
-            return new State<TState, TEvent>(id, this.stateMachineInformation, this.extensionHost);
+            return new State<TState, TEvent>(id, stateMachineInformation, extensionHost);
         }
 
         public virtual ITransition<TState, TEvent> CreateTransition()
         {
-            return new Transition<TState, TEvent>(this.stateMachineInformation, this.extensionHost);
+            return new Transition<TState, TEvent>(stateMachineInformation, extensionHost);
         }
 
         public virtual IActionHolder CreateActionHolder(Action action)
@@ -69,7 +69,7 @@ namespace Appccelerate.StateMachine.Machine
 
         public virtual IActionHolder CreateActionHolder<T>(Action<T> action, T parameter)
         {
-            return new ParametrizedActionHolder<T>(action, parameter);    
+            return new ParametrizedActionHolder<T>(action, parameter);
         }
 
         public virtual IActionHolder CreateTransitionActionHolder(Action action)
@@ -81,7 +81,7 @@ namespace Appccelerate.StateMachine.Machine
         {
             return new ArgumentActionHolder<T>(action);
         }
-        
+
         public virtual IGuardHolder CreateGuardHolder(Func<bool> guard)
         {
             return new ArgumentLessGuardHolder(guard);
@@ -92,12 +92,14 @@ namespace Appccelerate.StateMachine.Machine
             return new ArgumentGuardHolder<T>(guard);
         }
 
-        public virtual ITransitionContext<TState, TEvent> CreateTransitionContext(IState<TState, TEvent> state, Missable<TEvent> eventId, object eventArgument, INotifier<TState, TEvent> notifier)
+        public virtual ITransitionContext<TState, TEvent> CreateTransitionContext(IState<TState, TEvent> state,
+            Missable<TEvent> eventId, object eventArgument, INotifier<TState, TEvent> notifier)
         {
             return new TransitionContext<TState, TEvent>(state, eventId, eventArgument, notifier);
         }
 
-        public virtual StateMachineInitializer<TState, TEvent> CreateStateMachineInitializer(IState<TState, TEvent> initialState, ITransitionContext<TState, TEvent> context)
+        public virtual StateMachineInitializer<TState, TEvent> CreateStateMachineInitializer(
+            IState<TState, TEvent> initialState, ITransitionContext<TState, TEvent> context)
         {
             return new StateMachineInitializer<TState, TEvent>(initialState, context);
         }

@@ -16,17 +16,17 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System.Globalization;
+
 namespace Appccelerate.StateMachine.Machine.ActionHolders
 {
-    using System.Globalization;
-    
     /// <summary>
-    /// Holds all exception messages
+    ///     Holds all exception messages
     /// </summary>
     public static class ActionHoldersExceptionMessages
     {
         /// <summary>
-        /// Cannot cast argument to action argument.
+        ///     Cannot cast argument to action argument.
         /// </summary>
         /// <param name="argument">The argument.</param>
         /// <param name="action">The action.</param>

@@ -16,26 +16,26 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Syntax
 {
-    using System;
-
     /// <summary>
-    /// Defines the exit action syntax.
+    ///     Defines the exit action syntax.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     public interface IExitActionSyntax<TState, TEvent> : IEventSyntax<TState, TEvent>
     {
         /// <summary>
-        /// Defines an exit action.
+        ///     Defines an exit action.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <returns>Event syntax.</returns>
         IExitActionSyntax<TState, TEvent> ExecuteOnExit(Action action);
 
         /// <summary>
-        /// Defines an exit action.
+        ///     Defines an exit action.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <returns>Event syntax.</returns>
@@ -43,7 +43,7 @@ namespace Appccelerate.StateMachine.Syntax
         IExitActionSyntax<TState, TEvent> ExecuteOnExit<T>(Action<T> action);
 
         /// <summary>
-        /// Defines an exit action.
+        ///     Defines an exit action.
         /// </summary>
         /// <typeparam name="T">Type of the parameter of the exit action method.</typeparam>
         /// <param name="action">The action.</param>

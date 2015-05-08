@@ -16,12 +16,12 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-
     /// <summary>
-    /// A value which can be initialized.
+    ///     A value which can be initialized.
     /// </summary>
     /// <typeparam name="T">Type of the value.</typeparam>
     public class Initializable<T>
@@ -29,38 +29,39 @@ namespace Appccelerate.StateMachine.Machine
         private T value;
 
         /// <summary>
-        /// Gets or sets the value.
+        ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         public T Value
         {
             get
             {
-                this.CheckInitialized();
+                CheckInitialized();
 
-                return this.value;
+                return value;
             }
 
             set
             {
-                this.CheckNotAlreadyInitialized();
+                CheckNotAlreadyInitialized();
 
-                this.IsInitialized = true;
+                IsInitialized = true;
 
                 this.value = value;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is initialized (has a set value).
+        ///     Gets a value indicating whether this instance is initialized (has a set value).
         /// </summary>
-        /// <value><c>true</c> if this instance is initialized; otherwise, <c>false</c>.
+        /// <value>
+        ///     <c>true</c> if this instance is initialized; otherwise, <c>false</c>.
         /// </value>
         public bool IsInitialized { get; private set; }
 
         private void CheckInitialized()
         {
-            if (!this.IsInitialized)
+            if (!IsInitialized)
             {
                 throw new InvalidOperationException(ExceptionMessages.ValueNotInitialized);
             }
@@ -68,7 +69,7 @@ namespace Appccelerate.StateMachine.Machine
 
         private void CheckNotAlreadyInitialized()
         {
-            if (this.IsInitialized)
+            if (IsInitialized)
             {
                 throw new InvalidOperationException(ExceptionMessages.ValueAlreadyInitialized);
             }

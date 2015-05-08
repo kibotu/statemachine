@@ -16,19 +16,19 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace Appccelerate.StateMachine
 {
-    using System;
-    using System.Collections.Generic;
-
     public static class ListExtensionMethods
     {
-         public static void ForEach<T>(this IList<T> list, Action<T> action)
-         {
-             foreach (T item in list)
-             {
-                 action(item);
-             }
-         }
+        public static void ForEach<T>(this IList<T> list, Action<T> action)
+        {
+            foreach (var item in list)
+            {
+                action(item);
+            }
+        }
     }
 }

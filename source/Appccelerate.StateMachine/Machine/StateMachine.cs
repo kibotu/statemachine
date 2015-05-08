@@ -16,38 +16,38 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Appccelerate.StateMachine.Machine.Events;
+using Appccelerate.StateMachine.Persistence;
+using Appccelerate.StateMachine.Syntax;
+using JetBrains.Annotations;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
-    using Appccelerate.StateMachine.Machine.Events;
-    using Appccelerate.StateMachine.Persistence;
-    using Appccelerate.StateMachine.Syntax;
-
     /// <summary>
-    /// Base implementation of a state machine.
+    ///     Base implementation of a state machine.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
-    public class StateMachine<TState, TEvent> : 
-        INotifier<TState, TEvent>, 
+    public class StateMachine<TState, TEvent> :
+        INotifier<TState, TEvent>,
         IStateMachineInformation<TState, TEvent>,
         IExtensionHost<TState, TEvent>
         where TState : IComparable
         where TEvent : IComparable
     {
-        private readonly IStateDictionary<TState, TEvent> states;
+        private readonly List<IExtension<TState, TEvent>> extensions;
         private readonly IFactory<TState, TEvent> factory;
         private readonly Initializable<TState> initialStateId;
         private readonly string name;
-        private readonly List<IExtension<TState, TEvent>> extensions;
+        private readonly IStateDictionary<TState, TEvent> states;
         private IState<TState, TEvent> currentState;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateMachine{TState,TEvent}"/> class.
+        ///     Initializes a new instance of the <see cref="StateMachine{TState,TEvent}" /> class.
         /// </summary>
         public StateMachine()
             : this(null)
@@ -55,7 +55,7 @@ namespace Appccelerate.StateMachine.Machine
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateMachine{TState,TEvent}"/> class.
+        ///     Initializes a new instance of the <see cref="StateMachine{TState,TEvent}" /> class.
         /// </summary>
         /// <param name="name">The name of this state machine used in log messages.</param>
         public StateMachine(string name)
@@ -64,7 +64,7 @@ namespace Appccelerate.StateMachine.Machine
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateMachine{TState,TEvent}"/> class.
+        ///     Initializes a new instance of the <see cref="StateMachine{TState,TEvent}" /> class.
         /// </summary>
         /// <param name="name">The name of this state machine used in log messages.</param>
         /// <param name="factory">The factory used to create internal instances.</param>
@@ -72,234 +72,233 @@ namespace Appccelerate.StateMachine.Machine
         {
             this.name = name;
             this.factory = factory ?? new StandardFactory<TState, TEvent>(this, this);
-            this.states = new StateDictionary<TState, TEvent>(this.factory);
-            this.extensions = new List<IExtension<TState, TEvent>>();
+            states = new StateDictionary<TState, TEvent>(this.factory);
+            extensions = new List<IExtension<TState, TEvent>>();
 
-            this.initialStateId = new Initializable<TState>();
+            initialStateId = new Initializable<TState>();
         }
 
         /// <summary>
-        /// Occurs when no transition could be executed.
-        /// </summary>
-        public event EventHandler<TransitionEventArgs<TState, TEvent>> TransitionDeclined;
-
-        /// <summary>
-        /// Occurs when an exception was thrown inside a transition of the state machine.
-        /// </summary>
-        public event EventHandler<TransitionExceptionEventArgs<TState, TEvent>> TransitionExceptionThrown;
-
-        /// <summary>
-        /// Occurs when a transition begins.
-        /// </summary>
-        public event EventHandler<TransitionEventArgs<TState, TEvent>> TransitionBegin;
-
-        /// <summary>
-        /// Occurs when a transition completed.
-        /// </summary>
-        public event EventHandler<TransitionCompletedEventArgs<TState, TEvent>> TransitionCompleted;
-
-        /// <summary>
-        /// Gets the name of this instance.
-        /// </summary>
-        /// <value>The name of this instance.</value>
-        public string Name
-        {
-            get { return this.name; }
-        }
-
-        /// <summary>
-        /// Gets the id of the current state.
-        /// </summary>
-        /// <value>The id of the current state.</value>
-        public TState CurrentStateId
-        {
-            get { return this.CurrentState.Id; }
-        }
-
-        /// <summary>
-        /// Gets or sets the state of the current.
+        ///     Gets or sets the state of the current.
         /// </summary>
         /// <value>The state of the current.</value>
         private IState<TState, TEvent> CurrentState
         {
             get
             {
-                this.CheckThatStateMachineIsInitialized();
-                this.CheckThatStateMachineHasEnteredInitialState();
+                CheckThatStateMachineIsInitialized();
+                CheckThatStateMachineHasEnteredInitialState();
 
-                return this.currentState;
+                return currentState;
             }
 
             set
             {
-                IState<TState, TEvent> oldState = this.currentState;
+                var oldState = currentState;
 
-                this.currentState = value;
+                currentState = value;
 
-                this.extensions.ForEach(extension => extension.SwitchedState(this, oldState, this.currentState));
+                extensions.ForEach(extension => extension.SwitchedState(this, oldState, currentState));
             }
         }
 
         /// <summary>
-        /// Adds the <paramref name="extension"/>.
-        /// </summary>
-        /// <param name="extension">The extension.</param>
-        public void AddExtension(IExtension<TState, TEvent> extension)
-        {
-            this.extensions.Add(extension);
-        }
-
-        /// <summary>
-        /// Clears all extensions.
-        /// </summary>
-        public void ClearExtensions()
-        {
-            this.extensions.Clear();
-        }
-
-        /// <summary>
-        /// Executes the specified <paramref name="action"/> for all extensions.
+        ///     Executes the specified <paramref name="action" /> for all extensions.
         /// </summary>
         /// <param name="action">The action to execute.</param>
         public void ForEach(Action<IExtension<TState, TEvent>> action)
         {
-            this.extensions.ForEach(action);
+            extensions.ForEach(action);
+        }
+
+        public void OnExceptionThrown(ITransitionContext<TState, TEvent> context, Exception exception)
+        {
+            RethrowExceptionIfNoHandlerRegistered(exception, TransitionExceptionThrown);
+
+            RaiseEvent(TransitionExceptionThrown, new TransitionExceptionEventArgs<TState, TEvent>(context, exception),
+                context, false);
         }
 
         /// <summary>
-        /// Define the behavior of a state.
+        ///     Fires the <see cref="TransitionBegin" /> event.
+        /// </summary>
+        /// <param name="transitionContext">The transition context.</param>
+        public void OnTransitionBegin(ITransitionContext<TState, TEvent> transitionContext)
+        {
+            RaiseEvent(TransitionBegin, new TransitionEventArgs<TState, TEvent>(transitionContext), transitionContext,
+                true);
+        }
+
+        /// <summary>
+        ///     Gets the name of this instance.
+        /// </summary>
+        /// <value>The name of this instance.</value>
+        public string Name
+        {
+            get { return name; }
+        }
+
+        /// <summary>
+        ///     Gets the id of the current state.
+        /// </summary>
+        /// <value>The id of the current state.</value>
+        public TState CurrentStateId
+        {
+            get { return CurrentState.Id; }
+        }
+
+        /// <summary>
+        ///     Occurs when no transition could be executed.
+        /// </summary>
+        public event EventHandler<TransitionEventArgs<TState, TEvent>> TransitionDeclined;
+
+        /// <summary>
+        ///     Occurs when an exception was thrown inside a transition of the state machine.
+        /// </summary>
+        public event EventHandler<TransitionExceptionEventArgs<TState, TEvent>> TransitionExceptionThrown;
+
+        /// <summary>
+        ///     Occurs when a transition begins.
+        /// </summary>
+        public event EventHandler<TransitionEventArgs<TState, TEvent>> TransitionBegin;
+
+        /// <summary>
+        ///     Occurs when a transition completed.
+        /// </summary>
+        public event EventHandler<TransitionCompletedEventArgs<TState, TEvent>> TransitionCompleted;
+
+        /// <summary>
+        ///     Adds the <paramref name="extension" />.
+        /// </summary>
+        /// <param name="extension">The extension.</param>
+        public void AddExtension(IExtension<TState, TEvent> extension)
+        {
+            extensions.Add(extension);
+        }
+
+        /// <summary>
+        ///     Clears all extensions.
+        /// </summary>
+        public void ClearExtensions()
+        {
+            extensions.Clear();
+        }
+
+        /// <summary>
+        ///     Define the behavior of a state.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <returns>Syntax to build state behavior.</returns>
         public IEntryActionSyntax<TState, TEvent> In(TState state)
         {
-            IState<TState, TEvent> newState = this.states[state];
+            var newState = states[state];
 
-            return new StateBuilder<TState, TEvent>(newState, this.states, this.factory);
+            return new StateBuilder<TState, TEvent>(newState, states, factory);
         }
 
         /// <summary>
-        /// Initializes the state machine by setting the specified initial state.
+        ///     Initializes the state machine by setting the specified initial state.
         /// </summary>
         /// <param name="initialState">The initial state of the state machine.</param>
         public void Initialize(TState initialState)
         {
-            this.extensions.ForEach(extension => extension.InitializingStateMachine(this, ref initialState));
+            extensions.ForEach(extension => extension.InitializingStateMachine(this, ref initialState));
 
-            this.Initialize(this.states[initialState]);
+            Initialize(states[initialState]);
 
-            this.extensions.ForEach(extension => extension.InitializedStateMachine(this, initialState));
+            extensions.ForEach(extension => extension.InitializedStateMachine(this, initialState));
         }
 
         /// <summary>
-        /// Enters the initial state that was previously set with <see cref="Initialize(TState)"/>.
+        ///     Enters the initial state that was previously set with <see cref="Initialize(TState)" />.
         /// </summary>
         public void EnterInitialState()
         {
-            this.CheckThatStateMachineIsInitialized();
+            CheckThatStateMachineIsInitialized();
 
-            this.extensions.ForEach(extension => extension.EnteringInitialState(this, this.initialStateId.Value));
+            extensions.ForEach(extension => extension.EnteringInitialState(this, initialStateId.Value));
 
-            var context = this.factory.CreateTransitionContext(null, new Missable<TEvent>(), Missing.Value, this);
-            this.EnterInitialState(this.states[this.initialStateId.Value], context);
+            var context = factory.CreateTransitionContext(null, new Missable<TEvent>(), Missing.Value, this);
+            EnterInitialState(states[initialStateId.Value], context);
 
-            this.extensions.ForEach(extension => extension.EnteredInitialState(this, this.initialStateId.Value, context));
+            extensions.ForEach(extension => extension.EnteredInitialState(this, initialStateId.Value, context));
         }
 
         /// <summary>
-        /// Fires the specified event.
+        ///     Fires the specified event.
         /// </summary>
         /// <param name="eventId">The event.</param>
         public void Fire(TEvent eventId)
         {
-            this.Fire(eventId, Missing.Value);
+            Fire(eventId, Missing.Value);
         }
 
         /// <summary>
-        /// Fires the specified event.
+        ///     Fires the specified event.
         /// </summary>
         /// <param name="eventId">The event.</param>
         /// <param name="eventArgument">The event argument.</param>
         public void Fire(TEvent eventId, object eventArgument)
         {
-            this.CheckThatStateMachineIsInitialized();
-            this.CheckThatStateMachineHasEnteredInitialState();
+            CheckThatStateMachineIsInitialized();
+            CheckThatStateMachineHasEnteredInitialState();
 
-            this.extensions.ForEach(extension => extension.FiringEvent(this, ref eventId, ref eventArgument));
+            extensions.ForEach(extension => extension.FiringEvent(this, ref eventId, ref eventArgument));
 
-            ITransitionContext<TState, TEvent> context = this.factory.CreateTransitionContext(this.CurrentState, new Missable<TEvent>(eventId), eventArgument, this);
-            ITransitionResult<TState, TEvent> result = this.CurrentState.Fire(context);
+            var context = factory.CreateTransitionContext(CurrentState, new Missable<TEvent>(eventId), eventArgument,
+                this);
+            var result = CurrentState.Fire(context);
 
             if (!result.Fired)
             {
-                this.OnTransitionDeclined(context);
+                OnTransitionDeclined(context);
                 return;
             }
 
-            this.CurrentState = result.NewState;
+            CurrentState = result.NewState;
 
-            this.extensions.ForEach(extension => extension.FiredEvent(this, context));
+            extensions.ForEach(extension => extension.FiredEvent(this, context));
 
-            this.OnTransitionCompleted(context);
+            OnTransitionCompleted(context);
         }
 
         /// <summary>
-        /// Defines the hierarchy on.
+        ///     Defines the hierarchy on.
         /// </summary>
         /// <param name="superStateId">The super state id.</param>
         /// <returns>Syntax to build a state hierarchy.</returns>
         public IHierarchySyntax<TState> DefineHierarchyOn(TState superStateId)
         {
-            return new HierarchyBuilder<TState, TEvent>(this.states, superStateId);
-        }
-
-        public void OnExceptionThrown(ITransitionContext<TState, TEvent> context, Exception exception)
-        {
-            RethrowExceptionIfNoHandlerRegistered(exception, this.TransitionExceptionThrown);
-
-            this.RaiseEvent(this.TransitionExceptionThrown, new TransitionExceptionEventArgs<TState, TEvent>(context, exception), context, false);
+            return new HierarchyBuilder<TState, TEvent>(states, superStateId);
         }
 
         /// <summary>
-        /// Fires the <see cref="TransitionBegin"/> event.
-        /// </summary>
-        /// <param name="transitionContext">The transition context.</param>
-        public void OnTransitionBegin(ITransitionContext<TState, TEvent> transitionContext)
-        {
-            this.RaiseEvent(this.TransitionBegin, new TransitionEventArgs<TState, TEvent>(transitionContext), transitionContext, true);
-        }
-
-        /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        ///     Returns a <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        ///     A <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
         /// </returns>
         public override string ToString()
         {
-            return this.name ?? base.ToString();
+            return name ?? base.ToString();
         }
 
         /// <summary>
-        /// Creates a report with the specified generator.
+        ///     Creates a report with the specified generator.
         /// </summary>
         /// <param name="reportGenerator">The report generator.</param>
-        public void Report(IStateMachineReport<TState, TEvent> reportGenerator)
+        public void Report([NotNull] IStateMachineReport<TState, TEvent> reportGenerator)
         {
-            Ensure.ArgumentNotNull(reportGenerator, "reportGenerator");
-
-            reportGenerator.Report(this.ToString(), this.states.GetStates(), this.initialStateId);
+            reportGenerator.Report(ToString(), states.GetStates(), initialStateId);
         }
 
-        public void Save(IStateMachineSaver<TState> stateMachineSaver)
+        public void Save([NotNull] IStateMachineSaver<TState> stateMachineSaver)
         {
-            Ensure.ArgumentNotNull(stateMachineSaver, "stateMachineSaver");
+            stateMachineSaver.SaveCurrentState(currentState != null
+                ? new Initializable<TState> {Value = currentState.Id}
+                : new Initializable<TState>());
 
-            stateMachineSaver.SaveCurrentState(this.currentState != null ? 
-                new Initializable<TState> { Value = this.currentState.Id } : 
-                new Initializable<TState>());
-
-            IEnumerable<IState<TState, TEvent>> superStatesWithLastActiveState = this.states.GetStates()
+            IEnumerable<IState<TState, TEvent>> superStatesWithLastActiveState = states.GetStates()
                 .Where(s => s.SubStates.Any())
                 .Where(s => s.LastActiveState != null)
                 .ToList();
@@ -311,17 +310,17 @@ namespace Appccelerate.StateMachine.Machine
             stateMachineSaver.SaveHistoryStates(historyStates);
         }
 
-        public void Load(IStateMachineLoader<TState> stateMachineLoader)
+        public void Load([NotNull] IStateMachineLoader<TState> stateMachineLoader)
         {
-            Ensure.ArgumentNotNull(stateMachineLoader, "stateMachineLoader");
-            this.CheckThatStateMachineIsNotAlreadyInitialized();
+            CheckThatStateMachineIsNotAlreadyInitialized();
 
-            this.LoadCurrentState(stateMachineLoader);
-            this.LoadHistoryStates(stateMachineLoader);
+            LoadCurrentState(stateMachineLoader);
+            LoadHistoryStates(stateMachineLoader);
         }
 
         // ReSharper disable once UnusedParameter.Local
-        private static void RethrowExceptionIfNoHandlerRegistered<T>(Exception exception, EventHandler<T> exceptionHandler) where T : EventArgs
+        private static void RethrowExceptionIfNoHandlerRegistered<T>(Exception exception,
+            EventHandler<T> exceptionHandler) where T : EventArgs
         {
             if (exceptionHandler == null)
             {
@@ -330,37 +329,40 @@ namespace Appccelerate.StateMachine.Machine
         }
 
         /// <summary>
-        /// Fires the <see cref="TransitionDeclined"/> event.
+        ///     Fires the <see cref="TransitionDeclined" /> event.
         /// </summary>
         /// <param name="transitionContext">The transition event context.</param>
         private void OnTransitionDeclined(ITransitionContext<TState, TEvent> transitionContext)
         {
-            this.RaiseEvent(this.TransitionDeclined, new TransitionEventArgs<TState, TEvent>(transitionContext), transitionContext, true);
+            RaiseEvent(TransitionDeclined, new TransitionEventArgs<TState, TEvent>(transitionContext), transitionContext,
+                true);
         }
 
         /// <summary>
-        /// Fires the <see cref="TransitionCompleted"/> event.
+        ///     Fires the <see cref="TransitionCompleted" /> event.
         /// </summary>
         /// <param name="transitionContext">The transition event context.</param>
         private void OnTransitionCompleted(ITransitionContext<TState, TEvent> transitionContext)
         {
-            this.RaiseEvent(this.TransitionCompleted, new TransitionCompletedEventArgs<TState, TEvent>(this.CurrentStateId, transitionContext), transitionContext, true);
+            RaiseEvent(TransitionCompleted,
+                new TransitionCompletedEventArgs<TState, TEvent>(CurrentStateId, transitionContext), transitionContext,
+                true);
         }
 
         private void LoadCurrentState(IStateMachineLoader<TState> stateMachineLoader)
         {
-            Initializable<TState> loadedCurrentState = stateMachineLoader.LoadCurrentState();
+            var loadedCurrentState = stateMachineLoader.LoadCurrentState();
 
-            this.currentState = loadedCurrentState.IsInitialized ? this.states[loadedCurrentState.Value] : null;
+            currentState = loadedCurrentState.IsInitialized ? states[loadedCurrentState.Value] : null;
         }
 
         private void LoadHistoryStates(IStateMachineLoader<TState> stateMachineLoader)
         {
-            IDictionary<TState, TState> historyStates = stateMachineLoader.LoadHistoryStates();
-            foreach (KeyValuePair<TState, TState> historyState in historyStates)
+            var historyStates = stateMachineLoader.LoadHistoryStates();
+            foreach (var historyState in historyStates)
             {
-                IState<TState, TEvent> superState = this.states[historyState.Key];
-                IState<TState, TEvent> lastActiveState = this.states[historyState.Value];
+                var superState = states[historyState.Key];
+                var lastActiveState = states[historyState.Value];
 
                 if (!superState.SubStates.Contains(lastActiveState))
                 {
@@ -372,26 +374,27 @@ namespace Appccelerate.StateMachine.Machine
         }
 
         /// <summary>
-        /// Initializes the state machine by setting the specified initial state.
+        ///     Initializes the state machine by setting the specified initial state.
         /// </summary>
         /// <param name="initialState">The initial state.</param>
         private void Initialize(IState<TState, TEvent> initialState)
         {
-            if (this.initialStateId.IsInitialized)
+            if (initialStateId.IsInitialized)
             {
                 throw new InvalidOperationException(ExceptionMessages.StateMachineIsAlreadyInitialized);
             }
 
-            this.initialStateId.Value = initialState.Id;
+            initialStateId.Value = initialState.Id;
         }
 
         private void EnterInitialState(IState<TState, TEvent> initialState, ITransitionContext<TState, TEvent> context)
         {
-            var initializer = this.factory.CreateStateMachineInitializer(initialState, context);
-            this.CurrentState = initializer.EnterInitialState();
+            var initializer = factory.CreateStateMachineInitializer(initialState, context);
+            CurrentState = initializer.EnterInitialState();
         }
 
-        private void RaiseEvent<T>(EventHandler<T> eventHandler, T arguments, ITransitionContext<TState, TEvent> context, bool raiseEventOnException) where T : EventArgs
+        private void RaiseEvent<T>(EventHandler<T> eventHandler, T arguments, ITransitionContext<TState, TEvent> context,
+            bool raiseEventOnException) where T : EventArgs
         {
             try
             {
@@ -409,13 +412,13 @@ namespace Appccelerate.StateMachine.Machine
                     throw;
                 }
 
-                ((INotifier<TState, TEvent>)this).OnExceptionThrown(context, e);
+                ((INotifier<TState, TEvent>) this).OnExceptionThrown(context, e);
             }
         }
 
         private void CheckThatStateMachineIsInitialized()
         {
-            if (this.currentState == null && !this.initialStateId.IsInitialized)
+            if (currentState == null && !initialStateId.IsInitialized)
             {
                 throw new InvalidOperationException(ExceptionMessages.StateMachineNotInitialized);
             }
@@ -423,7 +426,7 @@ namespace Appccelerate.StateMachine.Machine
 
         private void CheckThatStateMachineIsNotAlreadyInitialized()
         {
-            if (this.currentState != null || this.initialStateId.IsInitialized)
+            if (currentState != null || initialStateId.IsInitialized)
             {
                 throw new InvalidOperationException(ExceptionMessages.StateMachineIsAlreadyInitialized);
             }
@@ -431,7 +434,7 @@ namespace Appccelerate.StateMachine.Machine
 
         private void CheckThatStateMachineHasEnteredInitialState()
         {
-            if (this.currentState == null)
+            if (currentState == null)
             {
                 throw new InvalidOperationException(ExceptionMessages.StateMachineHasNotYetEnteredInitialState);
             }

@@ -16,21 +16,20 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+
 namespace Appccelerate.StateMachine
 {
-    using System;
-
     public class EventInformation<TEvent>
         where TEvent : IComparable
     {
         public EventInformation(TEvent eventId, object eventArgument)
         {
-            this.EventId = eventId;
-            this.EventArgument = eventArgument;
+            EventId = eventId;
+            EventArgument = eventArgument;
         }
 
         public TEvent EventId { get; private set; }
-
         public object EventArgument { get; private set; }
     }
 }

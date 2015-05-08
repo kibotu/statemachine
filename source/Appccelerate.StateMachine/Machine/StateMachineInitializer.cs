@@ -16,14 +16,14 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace Appccelerate.StateMachine.Machine
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Responsible for entering the initial state of the state machine. 
-    /// All states up in the hierarchy are entered, too.
+    ///     Responsible for entering the initial state of the state machine.
+    ///     All states up in the hierarchy are entered, too.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -31,9 +31,8 @@ namespace Appccelerate.StateMachine.Machine
         where TState : IComparable
         where TEvent : IComparable
     {
-        private readonly IState<TState, TEvent> initialState;
-
         private readonly ITransitionContext<TState, TEvent> context;
+        private readonly IState<TState, TEvent> initialState;
 
         public StateMachineInitializer(IState<TState, TEvent> initialState, ITransitionContext<TState, TEvent> context)
         {
@@ -43,21 +42,21 @@ namespace Appccelerate.StateMachine.Machine
 
         public IState<TState, TEvent> EnterInitialState()
         {
-            var stack = this.TraverseUpTheStateHierarchy();
-            this.TraverseDownTheStateHierarchyAndEnterStates(stack);
+            var stack = TraverseUpTheStateHierarchy();
+            TraverseDownTheStateHierarchyAndEnterStates(stack);
 
-            return this.initialState.EnterByHistory(this.context);
+            return initialState.EnterByHistory(context);
         }
 
         /// <summary>
-        /// Traverses up the state hierarchy and build the stack of states.
+        ///     Traverses up the state hierarchy and build the stack of states.
         /// </summary>
         /// <returns>The stack containing all states up the state hierarchy.</returns>
         private Stack<IState<TState, TEvent>> TraverseUpTheStateHierarchy()
         {
             var stack = new Stack<IState<TState, TEvent>>();
 
-            var state = this.initialState;
+            var state = initialState;
             while (state != null)
             {
                 stack.Push(state);
@@ -71,8 +70,8 @@ namespace Appccelerate.StateMachine.Machine
         {
             while (stack.Count > 0)
             {
-                IState<TState, TEvent> state = stack.Pop();
-                state.Entry(this.context);
+                var state = stack.Pop();
+                state.Entry(context);
             }
         }
     }

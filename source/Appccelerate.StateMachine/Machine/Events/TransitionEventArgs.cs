@@ -16,13 +16,13 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Globalization;
+
 namespace Appccelerate.StateMachine.Machine.Events
 {
-    using System;
-    using System.Globalization;
-
     /// <summary>
-    /// Event arguments providing a transition context.
+    ///     Event arguments providing a transition context.
     /// </summary>
     /// <typeparam name="TState">The type of the state.</typeparam>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
@@ -32,7 +32,7 @@ namespace Appccelerate.StateMachine.Machine.Events
         where TEvent : IComparable
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransitionEventArgs&lt;TState, TEvent&gt;"/> class.
+        ///     Initializes a new instance of the <see cref="TransitionEventArgs&lt;TState, TEvent&gt;" /> class.
         /// </summary>
         /// <param name="context">The event context.</param>
         public TransitionEventArgs(ITransitionContext<TState, TEvent> context)
@@ -41,41 +41,42 @@ namespace Appccelerate.StateMachine.Machine.Events
         }
 
         /// <summary>
-        /// Gets the id of the source state of the transition.
+        ///     Gets the id of the source state of the transition.
         /// </summary>
         /// <value>The id of the source state of the transition.</value>
         public TState StateId
         {
-            get { return this.Context.State.Id; }
+            get { return Context.State.Id; }
         }
 
         /// <summary>
-        /// Gets the event id.
+        ///     Gets the event id.
         /// </summary>
         /// <value>The event id.</value>
         public TEvent EventId
         {
-            get { return this.Context.EventId.Value; }
+            get { return Context.EventId.Value; }
         }
 
         /// <summary>
-        /// Gets the event argument.
+        ///     Gets the event argument.
         /// </summary>
         /// <value>The event argument.</value>
         public object EventArgument
         {
-            get { return this.Context.EventArgument; }
+            get { return Context.EventArgument; }
         }
 
         /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        ///     Returns a <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        ///     A <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
         /// </returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Transition from state {0} on event {1}.", this.StateId, this.EventId);
+            return string.Format(CultureInfo.InvariantCulture, "Transition from state {0} on event {1}.", StateId,
+                EventId);
         }
     }
 }

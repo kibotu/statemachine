@@ -16,22 +16,22 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Appccelerate.StateMachine.Machine.GuardHolders
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
-    /// Holds an argument less guard.
+    ///     Holds an argument less guard.
     /// </summary>
     public class ArgumentLessGuardHolder : IGuardHolder
     {
         private readonly Func<bool> guard;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArgumentLessGuardHolder"/> class.
+        ///     Initializes a new instance of the <see cref="ArgumentLessGuardHolder" /> class.
         /// </summary>
         /// <param name="guard">The guard.</param>
         public ArgumentLessGuardHolder(Func<bool> guard)
@@ -40,22 +40,24 @@ namespace Appccelerate.StateMachine.Machine.GuardHolders
         }
 
         /// <summary>
-        /// Executes the guard.
+        ///     Executes the guard.
         /// </summary>
         /// <param name="argument">The state machine event argument.</param>
         /// <returns>Result of the guard execution.</returns>
         public bool Execute(object argument)
         {
-            return this.guard();
+            return guard();
         }
 
         /// <summary>
-        /// Describes the guard.
+        ///     Describes the guard.
         /// </summary>
         /// <returns>Description of the guard.</returns>
         public string Describe()
         {
-            return this.guard.GetMethodInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ? "anonymous" : this.guard.GetMethodInfo().Name;
+            return guard.GetMethodInfo().GetCustomAttributes(typeof (CompilerGeneratedAttribute), false).Any()
+                ? "anonymous"
+                : guard.GetMethodInfo().Name;
         }
     }
 }
